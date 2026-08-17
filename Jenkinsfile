@@ -20,7 +20,10 @@ standardPipeline(
     gradleToolName: 'Gradle',
     buildCommand: 'gradle clean build',
     sonarScannerToolName: 'sonar-scanner',
-    sonarScanCommand: '"%SONAR_SCANNER_HOME%\\bin\\sonar-scanner.bat" -Dsonar.projectKey=app-gradle -Dsonar.sources=src/main/java -Dsonar.java.binaries=build/classes/java/main',
+    sonarScanCommand: '''
+    gradle compileJava
+    "%SONAR_SCANNER_HOME%\\bin\\sonar-scanner.bat" -Dsonar.projectKey=app-gradle -Dsonar.sources=src/main/java -Dsonar.java.binaries=build/classes/java/main
+    ''',
     envMap: [
         'main': 'prod',
         'release/*': 'staging',
@@ -28,8 +31,7 @@ standardPipeline(
     ],
     defaultEnv: 'dev',
     deploySteps: { deployEnv ->
-        echo "Would deploy to environment: ${deployEnv}"
-        bat "podman build -t app-gradle:${deployEnv} ."
+        echo "Would deploy to environment: ${deployEnv} (image pulled from Nexus)"
     },
-    trivyImage: { deployEnv -> "app-gradle:${deployEnv}" }
+    dockerImage: { deployEnv -> "app-gradle:${deployEnv}" }
 )
