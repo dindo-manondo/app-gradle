@@ -30,5 +30,6 @@ standardPipeline(
     deploySteps: { deployEnv ->
         echo "Would deploy to environment: ${deployEnv}"
         bat "podman build -t app-gradle:${deployEnv} ."
-    }
+    },
+    trivyImage: { deployEnv -> "app-gradle:${deployEnv}" }
 )
